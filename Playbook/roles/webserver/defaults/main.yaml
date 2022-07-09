@@ -1,0 +1,8 @@
+---
+yum_http_packages:
+  - epel-release
+  - httpd
+
+
+
+

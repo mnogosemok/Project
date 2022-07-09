@@ -1,0 +1,43 @@
+---
+- name: MariaDB. Install packages to Centos
+  yum:
+    name: mariadb-server 
+    state: present
+  become: yes
+  tags:
+    db
+
+- name: MariaDB. Enable and start service on Centos
+  service:
+    name: mariadb
+    state: started
+    enabled: yes
+  become: yes
+  tags:
+    db
+
+- name: Install Netstat
+  yum:
+    name: 
+      - net-tools
+  become: yes
+  tags:
+    db
+ 
+- name: MariaDB. Check start
+  shell: netstat -na | grep 3306
+  register: port
+  become: yes
+  tags:
+    db
+
+- name: MariaDB. Show listening port
+  debug:
+    msg: "{{ port.stdout }}"
+  become: yes
+  tags:
+    db 
+
+  
+
+

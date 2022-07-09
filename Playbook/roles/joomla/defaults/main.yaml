@@ -1,0 +1,38 @@
+---
+# Install packages
+yum_php_packages:
+  - https://rpms.remirepo.net/enterprise/remi-release-7.rpm
+  - yum-utils
+
+yum_additional_packages:
+  - php  
+  - php-cli 
+  - php-fpm 
+  - php-mysqlnd 
+  - php-zip 
+  - php-devel 
+  - php-gd 
+  - php-mcrypt 
+  - php-mbstring 
+  - php-curl 
+  - php-xml 
+  - php-pear 
+  - php-bcmath 
+  - php-json
+
+# Create data base for joomla
+mariadb_root_password: ""
+mariadb_database: "joomla"
+mariadb_user: 
+  - { name: "joomla", password: "joomla" }
+
+#   # Install joomla
+joomla_version: "3.9.25"
+url_package: "https://github.com/joomla/joomla-cms/releases/download/{{ joomla_version }}/Joomla_{{ joomla_version }}-Stable-Full_Package.tar.gz"   
+archive_dir: "/tmp/joomla.tar.gz"
+joomla_dir: "/var/www/html/joomla.site"
+#
+#     
+#
+#
+#

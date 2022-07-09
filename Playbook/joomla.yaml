@@ -1,0 +1,7 @@
+---
+- hosts: nods1
+  roles:
+    - webserver
+    - db
+    - joomla
+

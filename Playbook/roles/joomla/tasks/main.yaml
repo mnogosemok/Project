@@ -1,0 +1,135 @@
+- name: Upgrade OS
+  yum:
+    name: '*'
+    state: latest
+  become: yes
+  tags:
+    php
+
+- name: PHP. Install packages
+  yum:
+    name: "{{ yum_php_packages }}"
+    state: present
+  become: yes
+  tags:
+    php
+
+- name: PHP. Enable Remi repository
+  shell: |
+    yum-config-manager --enable remi-php74
+  become: yes
+  tags:
+    php
+
+- name: PHP. Install additional packages
+  yum:
+    name: "{{ yum_additional_packages }}"
+    state: present
+  become: yes
+  tags:
+    php
+
+- name: PHP. Check PHP version
+  shell: |
+    php -v
+  register: version  
+  become: yes
+  tags:
+    php
+
+- name: PHP. Show PHP version
+  debug:
+    msg: "{{ version.stdout }}"
+  tags:
+    php 
+
+- name: Joomla_DB. Install MySQL-python
+  yum:
+    name: MySQL-python
+    state: present
+  become: yes
+  tags:
+    joomla_db
+    
+- name: Joomla_DB. Create database
+  mysql_db:
+    encoding: utf8
+    login_user: root
+    login_password: "{{ mariadb_root_password }}"
+    name: "{{ mariadb_database }}"
+    state: present
+  register: db_creation
+  become: yes
+  tags: 
+    joomla_db
+
+- name: Joomla_DB. Create user
+  mysql_user:
+    name: "{{ item.name }}"
+    password: "{{ item.password }}"
+    host: "localhost"
+    priv: "{{ mariadb_database }}.*:ALL"
+    login_user: root
+    login_password: "{{ mariadb_root_password }}"
+    state: present
+  no_log: true
+  with_items: "{{ mariadb_user }}"
+  become: yes
+  tags: 
+    joomla_db
+
+
+- name: Joomla install. Add joomla package
+  get_url:
+    url: "{{ url_package }}"
+    dest: "{{ archive_dir }}"
+  become: yes
+  tags:
+    joomla_install
+    
+- name: Joomla install. Create joomla dir
+  file: 
+    path: "{{ joomla_dir }}"
+    state: directory
+  become: yes
+  tags:
+    joomla_install
+
+- name: Joomla install. Unarchive joomla package
+  unarchive:
+    src: "{{ archive_dir }}"
+    dest: "{{ joomla_dir }}"
+    remote_src: true
+    owner: apache
+    group: apache
+    mode: 777
+  notify:
+    - Restart apache
+  become: yes
+  tags:
+    joomla_install
+
+- name: Permissions joomla directory 
+  file:
+    path: "{{ joomla_dir }}"
+    mode: 0755
+    recurse: yes
+  become: yes
+  tags:
+    joomla_install
+
+- name: Delete file to "tmp" directory
+  file:
+    path: "{{ archive_dir }}"
+    state: absent
+  become: yes
+  tags:
+    joomla_install
+
+- name: Allow_HTTP
+  shell: |
+    firewall-cmd --add-service=http --permanent
+    firewall-cmd --reload
+  become: yes
+  tags:
+    FW
