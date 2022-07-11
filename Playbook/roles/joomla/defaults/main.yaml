@@ -27,7 +27,7 @@ mariadb_user:
   - { name: "joomla", password: "joomla" }
 
 #   # Install joomla
-joomla_version: "3.8.1"
+joomla_version: "3.10.10"
 url_package: "https://github.com/joomla/joomla-cms/releases/download/{{ joomla_version }}/Joomla_{{ joomla_version }}-Stable-Full_Package.tar.gz"   
 archive_dir: "/tmp/joomla.tar.gz"
 joomla_dir: "/var/www/html/joomla.site"
